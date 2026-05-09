@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from app.routers import auth
+from app.database import engine
+from app import models
 
 app = FastAPI(
     title="Auth API",
@@ -8,6 +10,11 @@ app = FastAPI(
 )
 
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
+
+@app.on_event("startup")
+async def startup():
+    async with engine.begin() as conn:
+        print("✅ Database connected successfully")
 
 @app.get("/")
 async def root():
